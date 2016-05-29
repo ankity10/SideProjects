@@ -131,13 +131,6 @@ svc::svc(string filename)
 					system(("touch "+this->path_to_master_head).c_str());
 					system(("touch "+this->path_to_version_head).c_str());
 
-
-					this->fin_masterfile.open(path_to_masterfile);
-					this->fin_master_head.open(path_to_master_head);
-					this->fout_masterfile.open(path_to_masterfile);
-					this->fout_master_head.open(path_to_master_head);
-					this->fin_version_head.open(path_to_version_head);
-					this->fout_version_head.open(path_to_version_head);
 				}
 				else //repo exist - first commit is already done
 				{
@@ -158,6 +151,6 @@ svc::svc(string filename, int file_version){
 int main(int argc, char const *argv[])
 {
 	ios_base::sync_with_stdio(false);
-	svc obj("abc");	
+	
 	return 0;
 }

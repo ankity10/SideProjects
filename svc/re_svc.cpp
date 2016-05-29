@@ -36,8 +36,11 @@ using namespace std;
 	5. execute ./re_svc
 **/
 
-//#define CATCH_CONFIG_MAIN 
-//#include "catch.hpp"
+// #define CATCH_CONFIG_MAIN 
+// #include "catch.hpp"
+
+
+#define SIMPLE_DEBUG false
 
 //======================= testing header file ends ==============================
 
@@ -83,6 +86,8 @@ class svc
 		ofstream fout_master_head;
 		ifstream fin_version_head;
 		ofstream fout_version_head;
+		ifstream fin_version;
+
 
 	public:
 		svc();
@@ -180,10 +185,147 @@ svc::svc(string filename)
 
 
 svc::svc(string filename, int file_version){
-	this->version = file_version;
+
+	// Requested version
+	this->version = file_version; 
+	// SVC initialized file
 	this->filename = filename;
 
+	// real_version variable to decrement the requested version by 1 because versions are starting with 0
+	int real_version = this->version-1;
+	// convert to string
+	string real_version_str = to_string(real_version);
+
+	// Path calculation for required files
+	this->path_to_masterfile = ".svc/"+this->filename+"_repo/masterfile";
+	this->path_to_version = ".svc/"+this->filename+"_repo/version/"+"v"+real_version_str;
+	this->path_to_version_head = ".svc/"+this->filename+"_repo/version/version_head";
+
+	//===================== validations starts ================================
 	
+	// check if entered file exists or not
+	if(!fileExists(this->filename.c_str()))
+	{
+		cout<<"fatal: '"+this->filename+"' doesn't exist, Please try again."<<endl;
+		return;
+	}
+
+	// setup to read the version_head
+	string version_head_str;
+	fin_version_head.open(this->path_to_version_head);
+
+	// versoin_head opened or not
+	if(!fin_version_head.is_open())
+	{
+		cout<<"fatal: Unable to open '"+this->path_to_version_head+"', Please try again."<<endl;
+		return;
+	}
+
+	getline(fin_version_head,version_head_str);
+	int version_head_int = stoi(version_head_str);
+
+	// check if entered version number exists or not
+	if(version_head_int < this->version)
+	{
+		cout<<"fatal: Version doesn't exist yet, Number of versions available are: "+to_string(version_head_int)<<endl;
+		return;
+	}
+
+	// check if masterfile exists or not
+	if(!fileExists(this->path_to_masterfile.c_str()))
+	{
+		cout<<"fatal: Masterfile file: '"+this->path_to_masterfile+"' doesn't exist for '"+this->filename+"' file, Please try again."<<endl;
+		return;
+	}
+	// check if version file exists or not
+	if(!fileExists(this->path_to_version.c_str()))
+	{
+		cout<<"fatal: Version file: '"+this->path_to_version+"' doesn't exist, Please try again."<<endl;
+		return;
+	}
+	// check if version_head exists or not
+	if(!fileExists(this->path_to_version_head.c_str()))
+	{
+		cout<<"fatal: Version head: '"+this->path_to_version_head+"' doesn't exist, Please try again."<<endl;
+		return;
+	}
+
+	//===================== validations starts ================================
+
+	// Debug: variable printer
+	if(SIMPLE_DEBUG)
+	{
+		cout<<"================ DEBUG INFO STARTS =============="<<endl;
+		cout<<"Version path is = "<<this->path_to_version<<endl;
+		cout<<"Masterfile path is = "<<this->path_to_masterfile<<endl;
+		cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
+
+	}
+	
+	// buffer variable used to store the contents for requested version and then it will be printed
+	string buffer=""; 
+
+	// Opening the required files
+	this->fin_masterfile.open(this->path_to_masterfile);
+	this->fin_version.open(this->path_to_version);
+
+	// masterfile opened or not
+	if(!fin_masterfile.is_open())
+	{
+		cout<<"fatal: Unable to open '"+this->path_to_masterfile+"', Please try again."<<endl;
+		return;
+	}
+
+	// version file opened or not
+	if(!fin_version.is_open())
+	{
+		cout<<"fatal: Unable to open '"+this->path_to_version+"', Please try again."<<endl;
+		return;
+	}
+
+	//============================ Reading loop starts ==========================
+	// Reading loop: It will read each line of version file of requested version,
+	// it will fetch corresponding line from masterfile and will store those lines
+	// in 'buffer' (string) variable 
+	while(!fin_version.eof())
+	{
+		int seek_position;
+		string s;
+		// variable s will have a line number from version file fin_version
+		getline(fin_version,s);
+
+		// string to int
+		int line = stoi(s);
+		// logic variable line, wiil be used to calculate seek_position
+		line = line-1; 
+		// seek_posyion calculation, multiply by 10 because each line has max 10 char including newline 
+		seek_position = 10*line;
+		// moving the read pointer
+		fin_masterfile.seekg(seek_position);
+
+		// s2 to store the line fetched from masterfile
+		string s2;
+		getline(fin_masterfile,s2);
+
+		// appending s2 to buffer
+		buffer+=s2+"\n";
+
+		// Debug: variable printer
+		if(SIMPLE_DEBUG)
+		{
+			cout<<"================ DEBUG INFO STARTS =============="<<endl;
+			cout<<"Line number in string is = "<<s<<endl;
+			cout<<"Line number in int is = "<<line<<endl;
+			cout<<"Seek position is = "<<seek_position<<endl;
+			cout<<"Line read from master is = "<<s2<<endl;
+			cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
+		}
+
+	}
+	//============================ Reading loop ends ==========================
+
+	// Printing the buffer
+	cout<<buffer;
 	
 }
 
@@ -196,7 +338,6 @@ svc::svc(string filename, int file_version){
 //     REQUIRE( isInteger("assd") == false );
 //     REQUIRE( isInteger("ak2r4t3454") == false );
 // }
-
 //============================== Test cases ends ==============================
 
 
@@ -205,11 +346,7 @@ int main(int argc, char const *argv[])
 	ios_base::sync_with_stdio(false);
 
 
-
-
-
-
-//============================== 'svc filename version' starts =====================
+	//============================== 'svc filename version' starts =====================
 	// if two command line arguments are present
 	// first argument is program file itself, remaining two are given by user
 	if(argc==3){
@@ -227,7 +364,7 @@ int main(int argc, char const *argv[])
 			cout<<"fatal: 'svc filename version' expects 'version' to be an integer";
 		}
 	}
-//============================== 'svc filename version' starts =====================
+	//============================== 'svc filename version' starts =====================
 
 	
 	

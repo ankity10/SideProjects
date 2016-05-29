@@ -1,0 +1,14 @@
+						.svc
+						  |
+						  |
+					filename_repo
+						  |
+			______________|___________
+		   |		  	  |			  |
+		   |			  |			  |
+	  masterfile       mf_head    versions
+	  								  |
+	  							______|_____ _______ ........
+	  						   |            |		|		!
+	  						   |			|		|		!
+	  					  version_head		v1		v2		vnth

@@ -21,8 +21,45 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <ctype.h>
+#include <string>  												
 
 using namespace std;
+
+
+//======================== testing header file starts ===========================
+
+/** 1. uncomment the below two line for enableing the testing.
+	2. Uncomment the test cases in Testing area.
+	3. Comment the main function of file.
+	4. Run make
+	5. execute ./re_svc
+**/
+
+//#define CATCH_CONFIG_MAIN 
+//#include "catch.hpp"
+
+//======================= testing header file ends ==============================
+
+
+//======================= Global functions starts ================================
+
+bool isInteger(string str)
+{
+	string word = str;
+	bool isNumber = true;
+	for(string::const_iterator k = word.begin(); k != word.end(); ++k)
+	{
+	    isNumber = isNumber && isdigit(*k);
+	}
+	return isNumber;
+}
+
+//======================== Global functions end ================================
+
+
+
+
 
 class svc
 {
@@ -144,13 +181,56 @@ svc::svc(string filename)
 
 svc::svc(string filename, int file_version){
 	this->version = file_version;
+	this->filename = filename;
+
+	
 	
 }
+
+
+
+//============================== Test cases starts ==============================
+// TEST_CASE( "isInteger is computed", "[factorial]" ) {
+//     REQUIRE( isInteger("2312313123131") == true );
+//     REQUIRE( isInteger("2") == true );
+//     REQUIRE( isInteger("assd") == false );
+//     REQUIRE( isInteger("ak2r4t3454") == false );
+// }
+
+//============================== Test cases ends ==============================
 
 
 int main(int argc, char const *argv[])
 {
 	ios_base::sync_with_stdio(false);
+
+
+
+
+
+
+//============================== 'svc filename version' starts =====================
+	// if two command line arguments are present
+	// first argument is program file itself, remaining two are given by user
+	if(argc==3){
+		
+		string filename = argv[1];
+		string version_str = argv[2];
+
+		if(isInteger(version_str))
+		{
+			int version_int = stoi(version_str);
+			svc obj(filename, version_int);
+		}
+		else
+		{
+			cout<<"fatal: 'svc filename version' expects 'version' to be an integer";
+		}
+	}
+//============================== 'svc filename version' starts =====================
+
 	
+	
+	cout<<endl;
 	return 0;
 }

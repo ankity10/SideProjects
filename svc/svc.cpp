@@ -36,6 +36,12 @@ class svc
 		string path_to_master_head;
 		string path_to_version_head;
 		string path_to_current_version;
+		ifstream fin_masterfile;
+		ifstream fin_master_head;
+		ofstream fout_masterfile;
+		ofstream fout_master_head;
+		ifstream fin_version_head;
+		ofstream fout_version_head;
 
 	public:
 		svc();
@@ -110,7 +116,21 @@ svc::svc(string filename)
 					path_to_masterfile = this->path_to_repo + "masterfile";
 					path_to_master_head = this->path_to_repo + "master_head";
 					path_to_version = this->path_to_repo + "version/";
-					path_to_version_head = this->path_to_version + "ver_head";
+					path_to_version_head = this->path_to_version + "version_head";
+
+
+					// Creting files	
+					system(("touch "+this->path_to_masterfile).c_str());
+					system(("touch "+this->path_to_master_head).c_str());
+					system(("touch "+this->path_to_version_head).c_str());
+
+
+					this->fin_masterfile.open(path_to_masterfile);
+					this->fin_master_head.open(path_to_master_head);
+					this->fout_masterfile.open(path_to_masterfile);
+					this->fout_master_head.open(path_to_master_head);
+					this->fin_version_head.open(path_to_version_head);
+					this->fout_version_head.open(path_to_version_head);
 				}
 				else //repo exist - first commit is already done
 				{

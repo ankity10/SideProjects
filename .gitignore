@@ -72,3 +72,10 @@ modules/views/
 # vim Files
 # --------------------
 *.swp
+
+
+# --------------------
+# ignore executables
+# --------------------
+*.o
+re_svc*

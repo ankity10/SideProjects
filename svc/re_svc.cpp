@@ -58,6 +58,19 @@ bool isInteger(string str)
 	return isNumber;
 }
 
+int str_to_int(string s)
+{
+	int sum=0;
+	int p=1;
+	for(int i=s.length()-1;i>=0;i--)
+	{
+		sum+=p*(s[i]-'0');
+		p*=10;
+	}
+	return sum;
+}
+
+
 //======================== Global functions end ================================
 
 
@@ -188,86 +201,97 @@ svc::svc(string filename)
 
 svc::svc(string filename, int file_version){
 
-	// Requested version
-	this->version = file_version; 
-	// SVC initialized file
-	this->filename = filename;
 
-	// real_version variable to decrement the requested version by 1 because versions are starting with 0
-	int real_version = this->version;
-	// convert to string
-	string real_version_str = to_string(real_version);
 
-	// Path calculation for required files
-	this->path_to_masterfile = ".svc/"+this->filename+"_repo/masterfile";
-	this->path_to_version = ".svc/"+this->filename+"_repo/version/"+"v"+real_version_str;
-	this->path_to_version_head = ".svc/"+this->filename+"_repo/version/version_head";
-
-	//===================== validations starts ================================
-	
-	// check if entered file exists or not
-	if(!fileExists(this->filename.c_str()))
+	if(!dirExists(".svc"))   // .svc doesn't exist
 	{
-		cout<<"fatal: '"+this->filename+"' doesn't exist, Please try again."<<endl;
-		exit (EXIT_FAILURE);
+			cout<<"Initialization not done! Use 'svc init' to initialize the current directory\n";
+			exit(EXIT_FAILURE);
 	}
-
-	// setup to read the version_head
-	string version_head_str;
-	this->fin_version_head.open(this->path_to_version_head);
-
-	// versoin_head opened or not
-	if(!this->fin_version_head.is_open())
+	else   //.svc exists
 	{
-		cout<<"fatal: Unable to open '"+this->path_to_version_head+"', Please try again."<<endl;
-		exit (EXIT_FAILURE);
-	}
 
-	getline(this->fin_version_head,version_head_str);
-	int version_head_int = stoi(version_head_str);
+			// Requested version
+		this->version = file_version; 
+		// SVC initialized file
+		this->filename = filename;
 
-	// check if entered version number exists or not
-	if(version_head_int < this->version)
-	{
-		cout<<"fatal: Version doesn't exist yet, Number of versions available are: "+to_string(version_head_int)<<endl;
-		exit (EXIT_FAILURE);
-	}
-	// check if entered version number is leass than 0 or not
-	if(this->version<0)
-	{
-		cout<<"fatal: Version number cannot be less then 0, version num"<<endl;
-		exit (EXIT_FAILURE);
-	}
+		// real_version variable to decrement the requested version by 1 because versions are starting with 0
+		int real_version = this->version;
+		// convert to string
+		string real_version_str = to_string(real_version);
 
-	// check if masterfile exists or not
-	if(!fileExists(this->path_to_masterfile.c_str()))
-	{
-		cout<<"fatal: Masterfile file: '"+this->path_to_masterfile+"' doesn't exist for '"+this->filename+"' file, Please try again."<<endl;
-		exit (EXIT_FAILURE);
-	}
-	// check if version file exists or not
-	if(!fileExists(this->path_to_version.c_str()))
-	{
-		cout<<"fatal: Version file: '"+this->path_to_version+"' doesn't exist, Please try again."<<endl;
-		exit (EXIT_FAILURE);
-	}
-	// check if version_head exists or not
-	if(!fileExists(this->path_to_version_head.c_str()))
-	{
-		cout<<"fatal: Version head: '"+this->path_to_version_head+"' doesn't exist, Please try again."<<endl;
-		exit (EXIT_FAILURE);
-	}
+		// Path calculation for required files
+		this->path_to_masterfile = ".svc/"+this->filename+"_repo/masterfile";
+		this->path_to_version = ".svc/"+this->filename+"_repo/version/"+"v"+real_version_str;
+		this->path_to_version_head = ".svc/"+this->filename+"_repo/version/version_head";
 
-	//===================== validations ends ================================
+		//===================== validations starts ================================
+		
+		// check if entered file exists or not
+		if(!fileExists(this->filename.c_str()))
+		{
+			cout<<"fatal: '"+this->filename+"' doesn't exist, Please try again."<<endl;
+			exit (EXIT_FAILURE);
+		}
 
-	// Debug: variable printer
-	if(SIMPLE_DEBUG)
-	{
-		cout<<"================ DEBUG INFO STARTS =============="<<endl;
-		cout<<"Version path is = "<<this->path_to_version<<endl;
-		cout<<"Masterfile path is = "<<this->path_to_masterfile<<endl;
-		cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
+		// setup to read the version_head
+		string version_head_str;
+		this->fin_version_head.open(this->path_to_version_head);
 
+		// versoin_head opened or not
+		if(!this->fin_version_head.is_open())
+		{
+			cout<<"fatal: Unable to open '"+this->path_to_version_head+"', Please try again."<<endl;
+			exit (EXIT_FAILURE);
+		}
+
+		getline(this->fin_version_head,version_head_str);
+		int version_head_int = str_to_int(version_head_str);
+
+		// check if entered version number exists or not
+		if(version_head_int < this->version)
+		{
+			cout<<"fatal: Version doesn't exist yet, Number of versions available are: "+to_string(version_head_int)<<endl;
+			exit (EXIT_FAILURE);
+		}
+		// check if entered version number is leass than 0 or not
+		if(this->version<0)
+		{
+			cout<<"fatal: Version number cannot be less then 0, version num"<<endl;
+			exit (EXIT_FAILURE);
+		}
+
+		// check if masterfile exists or not
+		if(!fileExists(this->path_to_masterfile.c_str()))
+		{
+			cout<<"fatal: Masterfile file: '"+this->path_to_masterfile+"' doesn't exist for '"+this->filename+"' file, Please try again."<<endl;
+			exit (EXIT_FAILURE);
+		}
+		// check if version file exists or not
+		if(!fileExists(this->path_to_version.c_str()))
+		{
+			cout<<"fatal: Version file: '"+this->path_to_version+"' doesn't exist, Please try again."<<endl;
+			exit (EXIT_FAILURE);
+		}
+		// check if version_head exists or not
+		if(!fileExists(this->path_to_version_head.c_str()))
+		{
+			cout<<"fatal: Version head: '"+this->path_to_version_head+"' doesn't exist, Please try again."<<endl;
+			exit (EXIT_FAILURE);
+		}
+
+		//===================== validations ends ================================
+
+		// Debug: variable printer
+		if(SIMPLE_DEBUG)
+		{
+			cout<<"================ DEBUG INFO STARTS =============="<<endl;
+			cout<<"Version path is = "<<this->path_to_version<<endl;
+			cout<<"Masterfile path is = "<<this->path_to_masterfile<<endl;
+			cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
+
+		}
 	}
 	
 }
@@ -308,7 +332,7 @@ string svc::retrive()
 		getline(this->fin_version,s);
 
 		// string to int
-		int line = stoi(s);
+		int line = str_to_int(s);
 		// logic variable line, wiil be used to calculate seek_position
 		line = line-1; 
 		// seek_posyion calculation, multiply by 10 because each line has max 10 char including newline 
@@ -346,6 +370,9 @@ string svc::retrive()
 
 
 
+
+
+
 int main(int argc, char const *argv[])
 {
 	ios_base::sync_with_stdio(false);
@@ -359,10 +386,9 @@ int main(int argc, char const *argv[])
 		
 		string filename = argv[1];
 		string version_str = argv[2];
-
 		if(isInteger(version_str))
 		{
-			int version_int = stoi(version_str);
+			int version_int = str_to_int(version_str) ;
 			svc obj(filename, version_int);
 			string version_file = obj.retrive();
 			cout<<version_file;

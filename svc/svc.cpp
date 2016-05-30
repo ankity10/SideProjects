@@ -24,24 +24,6 @@
 
 using namespace std;
 
-//======================== testing header file starts ===========================
-
-/** 1. uncomment the below two line for enableing the testing.
-	2. Uncomment the test cases in Testing area.
-	3. Comment the main function of file.
-	4. Run make
-	5. execute ./re_svc
-**/
-
-// #define CATCH_CONFIG_MAIN 
-// #include "catch.hpp"
-
-
-#define SIMPLE_DEBUG false
-
-//======================= testing header file ends ==============================
-
-
 class svc
 {
 	private:
@@ -252,7 +234,7 @@ void svc::commit()
 	prev_last--;
 	fin_prev_version.close();
 
-	if(file_last>=prev_last)  //Append the last line
+	if(file_last>prev_last)  //Append the last line
 	{
 		cout<<"In if!!";
 		
@@ -311,39 +293,44 @@ void svc::commit()
 		fin_masterfile.seekg(file_ptr);
 		getline(fin_masterfile, prev_line);
 
-		getline(fin_filename, temp);
-		for(int i=0;i<temp.length();i++)
-			file_line[i]=temp[i];
-		for(int i=temp.length();i<9;i++)
-			file_line[i]=' ';
-
-
-		while(file_line==prev_line)
+		if(!fin_filename.eof())
 		{
-			fout_current_version<<line_no<<endl;
-
 			getline(fin_filename, temp);
 			for(int i=0;i<temp.length();i++)
 				file_line[i]=temp[i];
 			for(int i=temp.length();i<9;i++)
 				file_line[i]=' ';
 
-			getline(fin_prev_version, line_no);
-			int line = stoi(line_no);
+			
+			while(file_line==prev_line)
+			{
+				fout_current_version<<line_no<<endl;
 
-			int file_ptr = (line-1)*10;
-			fin_masterfile.seekg(file_ptr);
-			getline(fin_masterfile, prev_line);
+				if(fin_filename.eof())
+					break;
+
+				getline(fin_filename, temp);
+				for(int i=0;i<temp.length();i++)
+					file_line[i]=temp[i];
+				for(int i=temp.length();i<9;i++)
+					file_line[i]=' ';
+
+				getline(fin_prev_version, line_no);
+				int line = stoi(line_no);
+
+				int file_ptr = (line-1)*10;
+				fin_masterfile.seekg(file_ptr);
+				getline(fin_masterfile, prev_line);
+			}
+
+
+			while(!fin_prev_version.eof() && !fin_filename.eof())
+			{
+				getline(fin_prev_version, temp);
+				if(!fin_prev_version.eof())
+					fout_current_version<<temp<<endl;
+			}
 		}
-
-
-		while(!fin_prev_version.eof())
-		{
-			getline(fin_prev_version, temp);
-			if(!fin_prev_version.eof())
-				fout_current_version<<temp<<endl;
-		}
-
 
 		this->fin_masterfile.close();
 
@@ -426,6 +413,10 @@ svc::svc(string filename)
 int main(int argc, char const *argv[])
 {
 	ios_base::sync_with_stdio(false);
-	svc obj("track.txt");   //Testing	
+
+	if(argc==2)
+	{
+		svc obj(argv[1]);   //Testing			
+	}
 	return 0;
 }

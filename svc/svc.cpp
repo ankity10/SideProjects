@@ -204,23 +204,24 @@ void svc::commit()
 	this->fout_current_version.open(path_to_current_version.c_str());
 	this->fin_filename.open(filename.c_str());
 	
-
 	this->fout_masterfile.open(path_to_masterfile.c_str(),ios::app);
 	this->fin_master_head.open(path_to_master_head.c_str());
 	
-
 	int file_last = 0;
 	string last_line;
 	this->fin_filename.seekg(0);
+
+	// getting lastline of current file
 	while(!this->fin_filename.eof())
 	{
 		getline(fin_filename,last_line);
 		file_last++;
 	}
-
-
+	cout<<file_last<<cout;
 	fin_prev_version.seekg(0);
 	int prev_last=0;
+
+	// getting lastline of previous file version
 	while(!fin_prev_version.eof())
 	{
 		string temp;
@@ -228,6 +229,7 @@ void svc::commit()
 		getline(fin_prev_version, temp);
 	}
 
+	
 	if(file_last>prev_last)  //Append the last line
 	{
 		cout<<"In if!!";
@@ -315,7 +317,6 @@ void svc::commit()
 
 		this->fin_masterfile.close();
 	}
-	
 	
 	this->fout_masterfile.close();
 	this->fin_master_head.close();

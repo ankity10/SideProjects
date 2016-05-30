@@ -206,6 +206,7 @@ svc::svc(string filename, int file_version){
 	if(!dirExists(".svc"))   // .svc doesn't exist
 	{
 			cout<<"Initialization not done! Use 'svc init' to initialize the current directory\n";
+			cout<<endl;
 			exit(EXIT_FAILURE);
 	}
 	else   //.svc exists
@@ -231,8 +232,18 @@ svc::svc(string filename, int file_version){
 		// check if entered file exists or not
 		if(!fileExists(this->filename.c_str()))
 		{
-			cout<<"fatal: '"+this->filename+"' doesn't exist, Please try again."<<endl;
+			cout<<"fatal: File '"+this->filename+"' doesn't exist, Please try again."<<endl;
+			cout<<endl;
 			exit (EXIT_FAILURE);
+		}
+
+		this->path_to_repo = ".svc/"+this->filename+"_repo/";
+				
+		if(!dirExists(this->path_to_repo.c_str()))  //repo doesn't exist!
+		{
+			cout<<"fatal: File repository for file '"+this->filename+"' not initialized, make atleast 1 commit using 'svc "+this->filename+"' to initialize file repository."<<endl;
+			cout<<endl;
+			exit(EXIT_FAILURE);
 		}
 
 		// setup to read the version_head
@@ -243,6 +254,7 @@ svc::svc(string filename, int file_version){
 		if(!this->fin_version_head.is_open())
 		{
 			cout<<"fatal: Unable to open '"+this->path_to_version_head+"', Please try again."<<endl;
+			cout<<endl;
 			exit (EXIT_FAILURE);
 		}
 
@@ -253,12 +265,14 @@ svc::svc(string filename, int file_version){
 		if(version_head_int < this->version)
 		{
 			cout<<"fatal: Version doesn't exist yet, Number of versions available are: "+to_string(version_head_int)<<endl;
+			cout<<endl;
 			exit (EXIT_FAILURE);
 		}
 		// check if entered version number is leass than 0 or not
 		if(this->version<0)
 		{
 			cout<<"fatal: Version number cannot be less then 0, version num"<<endl;
+			cout<<endl;
 			exit (EXIT_FAILURE);
 		}
 
@@ -266,18 +280,21 @@ svc::svc(string filename, int file_version){
 		if(!fileExists(this->path_to_masterfile.c_str()))
 		{
 			cout<<"fatal: Masterfile file: '"+this->path_to_masterfile+"' doesn't exist for '"+this->filename+"' file, Please try again."<<endl;
+			cout<<endl;
 			exit (EXIT_FAILURE);
 		}
 		// check if version file exists or not
 		if(!fileExists(this->path_to_version.c_str()))
 		{
 			cout<<"fatal: Version file: '"+this->path_to_version+"' doesn't exist, Please try again."<<endl;
+			cout<<endl;
 			exit (EXIT_FAILURE);
 		}
 		// check if version_head exists or not
 		if(!fileExists(this->path_to_version_head.c_str()))
 		{
 			cout<<"fatal: Version head: '"+this->path_to_version_head+"' doesn't exist, Please try again."<<endl;
+			cout<<endl;
 			exit (EXIT_FAILURE);
 		}
 
@@ -310,6 +327,7 @@ string svc::retrive()
 	if(!this->fin_masterfile.is_open())
 	{
 		cout<<"fatal: Unable to open '"+this->path_to_masterfile+"', Please try again."<<endl;
+		cout<<endl;
 		exit (EXIT_FAILURE);
 	}
 
@@ -317,6 +335,7 @@ string svc::retrive()
 	if(!this->fin_version.is_open())
 	{
 		cout<<"fatal: Unable to open '"+this->path_to_version+"', Please try again."<<endl;
+		cout<<endl;
 		exit (EXIT_FAILURE);
 	}
 
@@ -376,6 +395,7 @@ string svc::retrive()
 int main(int argc, char const *argv[])
 {
 	ios_base::sync_with_stdio(false);
+	cout<<endl;
 
 
 	//============================== svc retrival starts =====================
@@ -402,7 +422,7 @@ int main(int argc, char const *argv[])
 
 	
 	
-	cout<<endl;
+	cout<<endl<<endl;
 	return 0;
 }
 

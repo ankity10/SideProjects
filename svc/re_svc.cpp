@@ -1,19 +1,19 @@
-/*
-		FILE STRUCTURE:
-
-					     .svc
-						   |
-					  filename_repo
-					/               \
-				   /				 \
-				-masterfile           version
-				-master_head        /         \
-								ver_head	  -v1
-											  -v2
-											  -v3
-												:
-												:
-*/
+/**
+						.svc
+						  |
+						  |
+					filename_repo
+						  |
+			______________|___________
+		   |		  	  |			  |
+		   |			  |			  |
+	  masterfile       mf_head    versions
+	  								  |
+	  							______|_____ _______ ........
+	  						   |            |		|		!
+	  						   |			|		|		!
+	  					  version_head		v1		v2		vnth
+**/
 
 #include <iostream>
 #include <fstream>
@@ -95,6 +95,8 @@ class svc
 		svc(string, int);
 		bool dirExists(const char*);
 		bool fileExists(const char*);
+		string retrive();
+
 };
 
 
@@ -192,7 +194,7 @@ svc::svc(string filename, int file_version){
 	this->filename = filename;
 
 	// real_version variable to decrement the requested version by 1 because versions are starting with 0
-	int real_version = this->version-1;
+	int real_version = this->version;
 	// convert to string
 	string real_version_str = to_string(real_version);
 
@@ -207,50 +209,56 @@ svc::svc(string filename, int file_version){
 	if(!fileExists(this->filename.c_str()))
 	{
 		cout<<"fatal: '"+this->filename+"' doesn't exist, Please try again."<<endl;
-		return;
+		exit (EXIT_FAILURE);
 	}
 
 	// setup to read the version_head
 	string version_head_str;
-	fin_version_head.open(this->path_to_version_head);
+	this->fin_version_head.open(this->path_to_version_head);
 
 	// versoin_head opened or not
-	if(!fin_version_head.is_open())
+	if(!this->fin_version_head.is_open())
 	{
 		cout<<"fatal: Unable to open '"+this->path_to_version_head+"', Please try again."<<endl;
-		return;
+		exit (EXIT_FAILURE);
 	}
 
-	getline(fin_version_head,version_head_str);
+	getline(this->fin_version_head,version_head_str);
 	int version_head_int = stoi(version_head_str);
 
 	// check if entered version number exists or not
 	if(version_head_int < this->version)
 	{
 		cout<<"fatal: Version doesn't exist yet, Number of versions available are: "+to_string(version_head_int)<<endl;
-		return;
+		exit (EXIT_FAILURE);
+	}
+	// check if entered version number is leass than 0 or not
+	if(this->version<0)
+	{
+		cout<<"fatal: Version number cannot be less then 0, version num"<<endl;
+		exit (EXIT_FAILURE);
 	}
 
 	// check if masterfile exists or not
 	if(!fileExists(this->path_to_masterfile.c_str()))
 	{
 		cout<<"fatal: Masterfile file: '"+this->path_to_masterfile+"' doesn't exist for '"+this->filename+"' file, Please try again."<<endl;
-		return;
+		exit (EXIT_FAILURE);
 	}
 	// check if version file exists or not
 	if(!fileExists(this->path_to_version.c_str()))
 	{
 		cout<<"fatal: Version file: '"+this->path_to_version+"' doesn't exist, Please try again."<<endl;
-		return;
+		exit (EXIT_FAILURE);
 	}
 	// check if version_head exists or not
 	if(!fileExists(this->path_to_version_head.c_str()))
 	{
 		cout<<"fatal: Version head: '"+this->path_to_version_head+"' doesn't exist, Please try again."<<endl;
-		return;
+		exit (EXIT_FAILURE);
 	}
 
-	//===================== validations starts ================================
+	//===================== validations ends ================================
 
 	// Debug: variable printer
 	if(SIMPLE_DEBUG)
@@ -262,6 +270,11 @@ svc::svc(string filename, int file_version){
 
 	}
 	
+}
+
+
+string svc::retrive()
+{
 	// buffer variable used to store the contents for requested version and then it will be printed
 	string buffer=""; 
 
@@ -270,29 +283,29 @@ svc::svc(string filename, int file_version){
 	this->fin_version.open(this->path_to_version);
 
 	// masterfile opened or not
-	if(!fin_masterfile.is_open())
+	if(!this->fin_masterfile.is_open())
 	{
 		cout<<"fatal: Unable to open '"+this->path_to_masterfile+"', Please try again."<<endl;
-		return;
+		exit (EXIT_FAILURE);
 	}
 
 	// version file opened or not
-	if(!fin_version.is_open())
+	if(!this->fin_version.is_open())
 	{
 		cout<<"fatal: Unable to open '"+this->path_to_version+"', Please try again."<<endl;
-		return;
+		exit (EXIT_FAILURE);
 	}
 
 	//============================ Reading loop starts ==========================
 	// Reading loop: It will read each line of version file of requested version,
 	// it will fetch corresponding line from masterfile and will store those lines
 	// in 'buffer' (string) variable 
-	while(!fin_version.eof())
+	while(!this->fin_version.eof())
 	{
 		int seek_position;
 		string s;
 		// variable s will have a line number from version file fin_version
-		getline(fin_version,s);
+		getline(this->fin_version,s);
 
 		// string to int
 		int line = stoi(s);
@@ -301,11 +314,11 @@ svc::svc(string filename, int file_version){
 		// seek_posyion calculation, multiply by 10 because each line has max 10 char including newline 
 		seek_position = 10*line;
 		// moving the read pointer
-		fin_masterfile.seekg(seek_position);
+		this->fin_masterfile.seekg(seek_position);
 
 		// s2 to store the line fetched from masterfile
 		string s2;
-		getline(fin_masterfile,s2);
+		getline(this->fin_masterfile,s2);
 
 		// appending s2 to buffer
 		buffer+=s2+"\n";
@@ -325,8 +338,45 @@ svc::svc(string filename, int file_version){
 	//============================ Reading loop ends ==========================
 
 	// Printing the buffer
-	cout<<buffer;
+	// cout<<buffer;
+
+	return buffer;
+
+}
+
+
+
+int main(int argc, char const *argv[])
+{
+	ios_base::sync_with_stdio(false);
+
+
+	//============================== svc retrival starts =====================
+	// if two command line arguments are present
+	// first argument is program file itself, remaining two are given by user
+	if(argc==3){
+		
+		string filename = argv[1];
+		string version_str = argv[2];
+
+		if(isInteger(version_str))
+		{
+			int version_int = stoi(version_str);
+			svc obj(filename, version_int);
+			string version_file = obj.retrive();
+			cout<<version_file;
+		}
+		else
+		{
+			cout<<"fatal: 'svc filename version' expects 'version' to be an positive integer";
+		}
+	}
+	//============================== svc retrival ends =====================
+
 	
+	
+	cout<<endl;
+	return 0;
 }
 
 
@@ -340,34 +390,3 @@ svc::svc(string filename, int file_version){
 // }
 //============================== Test cases ends ==============================
 
-
-int main(int argc, char const *argv[])
-{
-	ios_base::sync_with_stdio(false);
-
-
-	//============================== 'svc filename version' starts =====================
-	// if two command line arguments are present
-	// first argument is program file itself, remaining two are given by user
-	if(argc==3){
-		
-		string filename = argv[1];
-		string version_str = argv[2];
-
-		if(isInteger(version_str))
-		{
-			int version_int = stoi(version_str);
-			svc obj(filename, version_int);
-		}
-		else
-		{
-			cout<<"fatal: 'svc filename version' expects 'version' to be an integer";
-		}
-	}
-	//============================== 'svc filename version' starts =====================
-
-	
-	
-	cout<<endl;
-	return 0;
-}

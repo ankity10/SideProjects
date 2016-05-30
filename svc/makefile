@@ -1,5 +1,5 @@
 
-re_svc: re_svc.o
+re_svc: re_svc.o svc
 	g++ -o re_svc re_svc.o
 
 re_svc.o: re_svc.cpp

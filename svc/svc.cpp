@@ -24,6 +24,24 @@
 
 using namespace std;
 
+//======================== testing header file starts ===========================
+
+/** 1. uncomment the below two line for enableing the testing.
+	2. Uncomment the test cases in Testing area.
+	3. Comment the main function of file.
+	4. Run make
+	5. execute ./re_svc
+**/
+
+// #define CATCH_CONFIG_MAIN 
+// #include "catch.hpp"
+
+
+#define SIMPLE_DEBUG false
+
+//======================= testing header file ends ==============================
+
+
 class svc
 {
 	private:

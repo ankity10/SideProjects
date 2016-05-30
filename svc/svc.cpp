@@ -392,6 +392,19 @@ svc::svc(string filename)
 int main(int argc, char const *argv[])
 {
 	ios_base::sync_with_stdio(false);
-	svc obj("track.txt");   //Testing	
+
+	if(argc==1)
+	{
+		svc obj;
+	}
+	else if(argc==2)
+	{
+		svc obj(argv[1]);   //Testing	
+
+	}
+	else if(argc==3)
+	{
+
+	}
 	return 0;
 }

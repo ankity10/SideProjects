@@ -151,7 +151,7 @@ void svc:: commit_ver0()
 	this->fout_version_head<<"0";
 	this->master_head=0;
 
-	fin_filename.seekg(ios::beg);
+	fin_filename.seekg(0,ios::beg);
 	while(!this->fin_filename.eof())
 	{
 		this->master_head++;
@@ -204,42 +204,50 @@ void svc::commit()
 	this->fout_current_version.open(path_to_current_version.c_str());
 	this->fin_filename.open(filename.c_str());
 	
+
 	this->fout_masterfile.open(path_to_masterfile.c_str(),ios::app);
 	this->fin_master_head.open(path_to_master_head.c_str());
 	
+
 	int file_last = 0;
 	string last_line;
-	this->fin_filename.seekg(0);
-
-	// getting lastline of current file
+	this->fin_filename.seekg(0, ios::beg);
 	while(!this->fin_filename.eof())
 	{
 		getline(fin_filename,last_line);
 		file_last++;
 	}
-	cout<<file_last<<cout;
-	fin_prev_version.seekg(0);
+	fin_filename.close();
+	cout<<last_line<<endl;
+
+	fin_prev_version.seekg(0, ios::beg);
 	int prev_last=0;
 
-	// getting lastline of previous file version
-	while(!fin_prev_version.eof())
+
+	while(!this->fin_prev_version.eof() )
 	{
 		string temp;
+		getline(this->fin_prev_version, temp);
 		prev_last++;
-		getline(fin_prev_version, temp);
+		// cout<<temp<<endl;
 	}
+	prev_last--;
+	fin_prev_version.close();
 
-	
-	if(file_last>prev_last)  //Append the last line
+	if(file_last>=prev_last)  //Append the last line
 	{
 		cout<<"In if!!";
-		this->fin_prev_version.seekg(0);
-		while(!this->fin_prev_version.eof())
+		
+		fin_prev_version.open(path_to_prev_version.c_str());
+		cout<<"Prev_last="<<prev_last<<endl;
+		while(prev_last--)
 		{
-			string s;
+			string s="";
 			getline(this->fin_prev_version, s);
+			cout<<"s="<<s<<endl;
 			fout_current_version<<s<<endl;
 		}
+
 		
 		fout_masterfile<<last_line;
 		for(int i=last_line.length()+1;i<10;i++)
@@ -255,9 +263,7 @@ void svc::commit()
 		this->fout_master_head.open(path_to_master_head.c_str());
 		this->fout_master_head<<master_head;
 
-		this->fout_current_version<<this->master_head;
-
-
+		this->fout_current_version<<this->master_head<<endl;
 	}
 
 	else    //Delete one line
@@ -271,52 +277,61 @@ void svc::commit()
 		fin_filename
 		fin_masterfile
 		*/
+		this->fin_prev_version.open(path_to_prev_version.c_str());
+		this->fin_filename.open(filename.c_str());
 
-		this->fin_prev_version.seekg(0);
-		this->fin_filename.seekg(0);
+		string prev_line;
+		string file_line;
+		string line_no;
+		string temp;
+		file_line.resize(9);
 
-		while(!this->fin_prev_version.eof())
+		getline(fin_prev_version, line_no);
+		int line = stoi(line_no);
+
+		int file_ptr = (line-1)*10;
+		fin_masterfile.seekg(file_ptr);
+		getline(fin_masterfile, prev_line);
+
+		getline(fin_filename, temp);
+		for(int i=0;i<temp.length();i++)
+			file_line[i]=temp[i];
+		for(int i=temp.length();i<9;i++)
+			file_line[i]=' ';
+
+
+		while(file_line==prev_line)
 		{
-			string file_line, prev_ver_line, prev_ver;
-			string temp;
-			file_line.resize(9);
-			getline(fin_prev_version, prev_ver);
-			int master_line = stoi(prev_ver);
-			this->fin_masterfile.seekg((master_line-1)*10);
-			getline(this->fin_masterfile, prev_ver_line);
-			getline(this->fin_filename, temp);
+			fout_current_version<<line_no<<endl;
 
-			
-			//Space Padding
-			for(int i=0;i<temp.size();i++)
+			getline(fin_filename, temp);
+			for(int i=0;i<temp.length();i++)
 				file_line[i]=temp[i];
-			for(int i=temp.size();i<=9;i++)
+			for(int i=temp.length();i<9;i++)
 				file_line[i]=' ';
 
-			if(file_line==prev_ver_line)
-			{
-				fout_current_version<<master_line<<endl;
-			}
-			else
-			{
-				int file_ptr = this->fin_filename.tellg();
-				if(file_ptr!=-1)
-				{
-					file_ptr-=10;
-					this->fin_filename.seekg(file_ptr);
-				}
-				else
-				{
-					getline(this->fin_prev_version, prev_ver);	
-					fout_current_version<<prev_ver;
-				}
-			}
+			getline(fin_prev_version, line_no);
+			int line = stoi(line_no);
+
+			int file_ptr = (line-1)*10;
+			fin_masterfile.seekg(file_ptr);
+			getline(fin_masterfile, prev_line);
 		}
+
+
+		while(!fin_prev_version.eof())
+		{
+			getline(fin_prev_version, temp);
+			if(!fin_prev_version.eof())
+				fout_current_version<<temp<<endl;
+		}
+
 
 		this->fin_masterfile.close();
 
 		this->fin_masterfile.close();
 	}
+	
 	
 	this->fout_masterfile.close();
 	this->fin_master_head.close();
@@ -393,19 +408,6 @@ svc::svc(string filename)
 int main(int argc, char const *argv[])
 {
 	ios_base::sync_with_stdio(false);
-
-	if(argc==1)
-	{
-		svc obj;
-	}
-	else if(argc==2)
-	{
-		svc obj(argv[1]);   //Testing	
-
-	}
-	else if(argc==3)
-	{
-
-	}
+	svc obj("track.txt");   //Testing	
 	return 0;
 }

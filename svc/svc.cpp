@@ -313,15 +313,8 @@ void svc::commit()
 
 		this->fin_masterfile.close();
 
-
-
-
 		this->fin_masterfile.close();
 	}
-
-
-
-		
 	
 	
 	this->fout_masterfile.close();
@@ -331,12 +324,7 @@ void svc::commit()
 	this->fout_current_version.close();
 	this->fin_prev_version.close();
 
-
-
 }
-
-
-
 
 
 
@@ -404,6 +392,6 @@ svc::svc(string filename)
 int main(int argc, char const *argv[])
 {
 	ios_base::sync_with_stdio(false);
-	svc obj("abc.txt");	
+	svc obj("abc.txt");   //Testing	
 	return 0;
 }

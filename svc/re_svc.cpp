@@ -354,7 +354,8 @@ int main(int argc, char const *argv[])
 	//============================== svc retrival starts =====================
 	// if two command line arguments are present
 	// first argument is program file itself, remaining two are given by user
-	if(argc==3){
+	if(argc==3)
+	{
 		
 		string filename = argv[1];
 		string version_str = argv[2];

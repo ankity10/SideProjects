@@ -595,6 +595,8 @@ void svc::commit()
 			fout_current_version<<line_no<<endl;
 			getline(fin_prev_version, line_no);
 		}
+		
+		this->fin_masterfile.close();
 
 	}
 	else    //Delete one line
@@ -690,7 +692,6 @@ void svc::commit()
 
 		this->fin_masterfile.close();
 
-		this->fin_masterfile.close();
 	}
 	
 	

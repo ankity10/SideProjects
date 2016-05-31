@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/local/bin/python3
 import hashlib
 from collections import defaultdict
 import time
@@ -57,9 +57,9 @@ utf_buffer = binary_buffer.decode("utf-8")
 # size vs filenames dictionary
 size_list = defaultdict(list)
 
-for line in utf_buffer.split("&"):
-	if(line):
-		size,path=line.strip().split(";")	
+for pair in utf_buffer.split("&"):
+	if(pair):
+		size,path=pair.strip().split(";")	
 		size_list[int(size)].append(str(path))	
 
 # sha-1 vs filenames dictionary

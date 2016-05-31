@@ -455,34 +455,59 @@ void svc::commit()
 		file_last++;
 	}
 	fin_filename.close();
-	cout<<last_line<<endl;
+	// cout<<last_line<<endl;
+
 
 	fin_prev_version.seekg(0, ios::beg);
 	int prev_last=0;
-
+	string temp;
 
 	while(!this->fin_prev_version.eof() )
 	{
-		string temp;
 		getline(this->fin_prev_version, temp);
 		prev_last++;
 		// cout<<temp<<endl;
 	}
-	prev_last--;
 	fin_prev_version.close();
+	prev_last--;
+
+	if(SIMPLE_DEBUG)
+	{
+			cout<<"================ DEBUG INFO STARTS =============="<<endl;
+			cout<<"Last line of current file is = "<<last_line<<endl;
+			cout<<"Last line of previous file is = "<<temp<<endl;
+			cout<<"Line no of last line of current file is = "<<file_last<<endl;
+			cout<<"Line no of previuos verssion file is = "<<prev_last<<endl;
+			cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
+	}
 
 	if(file_last>prev_last)  //Append the last line
 	{
-		cout<<"In if!!";
+		
 		
 		fin_prev_version.open(path_to_prev_version.c_str());
-		cout<<"Prev_last="<<prev_last<<endl;
+		// cout<<"Prev_last="<<prev_last<<endl;
+		int debug_prev_last = prev_last;
+
+		if(SIMPLE_DEBUG)
+		{
+			cout<<"================ DEBUG INFO STARTS =============="<<endl;
+			cout<<"Inside if of commit()  function case"<<endl;
+			cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
+		}
+
 		while(prev_last--)
 		{
 			string s="";
 			getline(this->fin_prev_version, s);
-			cout<<"s="<<s<<endl;
+			// cout<<"s="<<s<<endl;
 			fout_current_version<<s<<endl;
+			if(SIMPLE_DEBUG)
+			{
+				cout<<"================ DEBUG INFO STARTS =============="<<endl;
+				cout<<(debug_prev_last-prev_last)<<"th line of previuos version file is "<<last_line<<endl;
+				cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
+			}
 		}
 
 		
@@ -505,7 +530,13 @@ void svc::commit()
 
 	else    //Delete one line
 	{
-		cout<<"In else!!";
+		// cout<<"In else!!";
+		if(SIMPLE_DEBUG)
+		{
+			cout<<"================ DEBUG INFO STARTS =============="<<endl;
+			cout<<"Inside else of commit() function case"<<endl;
+			cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
+		}
 		this->fin_masterfile.open(this->path_to_masterfile.c_str());
 		/*
 		List of files open:
@@ -559,15 +590,32 @@ void svc::commit()
 				fin_masterfile.seekg(file_ptr);
 				getline(fin_masterfile, prev_line);
 
-				cout<<"prev line = "<<prev_line<<endl;
+				if(SIMPLE_DEBUG)
+				{
+					cout<<"================ DEBUG INFO STARTS =============="<<endl;
+					cout<<"Inside Equal case while loop of else in commit() function"<<endl;
+					cout<<"Line of previous version file is "<<prev_line<<endl;
+					cout<<"Line of current version file is "<<file_line<<endl;
+					cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
+				}
+
 			}
 
 
 			while(!fin_prev_version.eof() )
 			{
+				
 				getline(fin_prev_version, temp);
 				if(!fin_prev_version.eof())
 					fout_current_version<<temp<<endl;
+
+				if(SIMPLE_DEBUG)
+				{
+					cout<<"================ DEBUG INFO STARTS =============="<<endl;
+					cout<<"Inside append case while loop of else in commit() function"<<endl;
+					cout<<"Appending line of previous version file is "<<temp<<endl;
+					cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
+				}
 			}
 		}
 

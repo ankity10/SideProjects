@@ -481,53 +481,122 @@ void svc::commit()
 			cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
 	}
 
-	if(file_last>prev_last)  //Append the last line
-	{
+	// if(file_last>prev_last)  //Append the last line
+	// {
 		
 		
-		fin_prev_version.open(path_to_prev_version.c_str());
-		// cout<<"Prev_last="<<prev_last<<endl;
-		int debug_prev_last = prev_last;
+	// 	fin_prev_version.open(path_to_prev_version.c_str());
+	// 	// cout<<"Prev_last="<<prev_last<<endl;
+	// 	int debug_prev_last = prev_last;
 
+	// 	if(SIMPLE_DEBUG)
+	// 	{
+	// 		cout<<"================ DEBUG INFO STARTS =============="<<endl;
+	// 		cout<<"Inside if of commit()  function case"<<endl;
+	// 		cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
+	// 	}
+
+	// 	while(prev_last--)
+	// 	{
+	// 		string s="";
+	// 		getline(this->fin_prev_version, s);
+	// 		// cout<<"s="<<s<<endl;
+	// 		fout_current_version<<s<<endl;
+	// 		if(SIMPLE_DEBUG)
+	// 		{
+	// 			cout<<"================ DEBUG INFO STARTS =============="<<endl;
+	// 			cout<<(debug_prev_last-prev_last)<<"th line of previuos version file is "<<last_line<<endl;
+	// 			cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
+	// 		}
+	// 	}
+
+		
+	// 	fout_masterfile<<last_line;
+	// 	for(int i=last_line.length()+1;i<10;i++)
+	// 		fout_masterfile<<" ";
+	// 	fout_masterfile<<endl;
+		
+	// 	string master_head;
+	// 	fin_master_head>>master_head;
+	// 	this->master_head=str_to_int(master_head);
+	// 	this->master_head++;
+	// 	master_head=itos(this->master_head);
+
+	// 	this->fout_master_head.open(path_to_master_head.c_str());
+	// 	this->fout_master_head<<master_head;
+
+	// 	this->fout_current_version<<this->master_head<<endl;
+	// }
+
+	if(file_last>prev_last)   //Insert line in between
+	{
+		cout<<"In if!!\n";
 		if(SIMPLE_DEBUG)
 		{
 			cout<<"================ DEBUG INFO STARTS =============="<<endl;
 			cout<<"Inside if of commit()  function case"<<endl;
 			cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
 		}
+		this->fin_masterfile.open(this->path_to_masterfile.c_str());
+		this->fin_prev_version.open(this->path_to_prev_version.c_str());
+		this->fin_filename.open(this->filename.c_str());
+
+		string prev_line;
+		string file_line;
+		string line_no;
+		string temp;
+		file_line.resize(9);
+
+		getline(fin_prev_version, line_no);
+		int line = str_to_int(line_no);
+
+		int file_ptr = (line-1)*10;
+		fin_masterfile.seekg(file_ptr);
+		getline(fin_masterfile, prev_line);
+
+		getline(fin_filename, temp);
+		for(int i=0;i<temp.length();i++)
+			file_line[i]=temp[i];
+		for(int i=temp.length();i<9;i++)
+			file_line[i]=' ';
+
+		
+		while(file_line==prev_line && prev_last)
+		{
+			prev_last--;
+			fout_current_version<<line_no<<endl;
+
+			getline(fin_filename, temp);
+			for(int i=0;i<temp.length();i++)
+				file_line[i]=temp[i];
+			for(int i=temp.length();i<9;i++)
+				file_line[i]=' ';
+
+			getline(fin_prev_version, line_no);
+			line = str_to_int(line_no);
+
+			int file_ptr = (line-1)*10;
+			fin_masterfile.seekg(file_ptr);
+			getline(fin_masterfile, prev_line);
+		}		
+
+		fout_masterfile<<file_line<<endl;   //Adding the inserted line in masterfile
+		string master_no;
+		fin_master_head>>master_no;
+		int master_line_no = str_to_int(master_no);
+		master_line_no++;
+		fout_master_head.open(path_to_master_head.c_str());
+		fout_master_head<<master_line_no;   //Updating the master_head
+
+		fout_current_version<<master_line_no<<endl; //Adding the inserted line to current version
 
 		while(prev_last--)
 		{
-			string s="";
-			getline(this->fin_prev_version, s);
-			// cout<<"s="<<s<<endl;
-			fout_current_version<<s<<endl;
-			if(SIMPLE_DEBUG)
-			{
-				cout<<"================ DEBUG INFO STARTS =============="<<endl;
-				cout<<(debug_prev_last-prev_last)<<"th line of previuos version file is "<<last_line<<endl;
-				cout<<"================ DEBUG INFO ENDS ================"<<endl<<endl;
-			}
+			fout_current_version<<line_no<<endl;
+			getline(fin_prev_version, line_no);
 		}
 
-		
-		fout_masterfile<<last_line;
-		for(int i=last_line.length()+1;i<10;i++)
-			fout_masterfile<<" ";
-		fout_masterfile<<endl;
-		
-		string master_head;
-		fin_master_head>>master_head;
-		this->master_head=str_to_int(master_head);
-		this->master_head++;
-		master_head=itos(this->master_head);
-
-		this->fout_master_head.open(path_to_master_head.c_str());
-		this->fout_master_head<<master_head;
-
-		this->fout_current_version<<this->master_head<<endl;
 	}
-
 	else    //Delete one line
 	{
 		// cout<<"In else!!";

@@ -4,6 +4,8 @@ import hashlib
 from collections import defaultdict
 import time
 from threading import Thread
+import subprocess
+import multiprocessing
 
 def hashfile(file_path):
     sha1 = hashlib.sha1()
@@ -14,44 +16,64 @@ def hashfile(file_path):
         f.close()
     return sha1.hexdigest()
 
-def main():
+def dispatch_threads():
+	# threads container to hold threads
 	threads = []
-	for size,file_path in size_list.items():
+	thread_num = 0
+	cpu_count = multiprocessing.cpu_count()
+	# creating one thread for each size having more than one file
+	for size, file_path in size_list.items():
 		if(len(file_path) != 1):
-			t = Thread(target=test, args=(size,file_path))
-			t.start()
-			threads.append(t)
-	for i in threads:
-		i.join()
+			thread_num = thread_num + 1
+			thread_obj = Thread(target=calc_sha_1, args=(size, file_path))
+			thread_obj.start()
+			threads.append(thread_obj)
+			
+			print(str(thread_num)+" thread started")
 
-def test(size_list, file_paths):
+			if thread_num%cpu_count == 0:
+				print("Waiting for previous 4 threads to complete the task")
+				thread_obj.join()
+
+	# joining threads to main thread
+	for thread in threads:
+		thread.join()
+
+# 
+def calc_sha_1(size_list, file_paths):
 	for file_path in file_paths:
 		sha1_list[hashfile(file_path)].append(file_path)
-	
+
+
 # Main function Start
-os.system("find -not -empty -type f -printf '%s\t%p\n'>a.txt")
-fil=open("a.txt","r")
+# os.system("find -not -empty -type f -printf '%s;%p\n'>a.txt")
+# info_file = open("a.txt","r")
 
-size_list=defaultdict(list)
-for line in fil:
-	size=int
-	path=str
-	size,path=line.split()	
-	size_list[size].append(path)	
+process_info = subprocess.run(["find", "-not", "-empty", "-type", "f", "-printf","%s;%p&"], stdout = subprocess.PIPE)
+binary_buffer = process_info.stdout
+utf_buffer = binary_buffer.decode("utf-8")
+# print(utf_buffer)
 
+
+# size vs filenames dictionary
+size_list = defaultdict(list)
+
+for line in utf_buffer.split("&"):
+	if(line):
+		size,path=line.strip().split(";")	
+		size_list[int(size)].append(str(path))	
+
+# sha-1 vs filenames dictionary
 sha1_list = defaultdict(list)
+# dispatch threads
+dispatch_threads()
 
-main()
-#Creating a Main thread
-# main_thread=Thread(target=main, args=(size_list,))
-# main_thread.start()
-# # time.sleep(2)
-# # Wait for other subthreads
-# main_thread.join()
-
+# Printing the results
 for sha_val, file_paths in sha1_list.items():
 	if(len(file_paths) > 1):
-		print "Sha1 value: "+sha_val+" duplicate files: "
+		print("Sha1 value: "+sha_val+" duplicate files: ",end='\n\n')
 		for file_path in file_paths:
-			print file_path,
+			print(file_path)
 
+print()
+print("Program completed successfully!!!!")

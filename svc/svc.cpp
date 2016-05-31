@@ -1,19 +1,19 @@
-/**
-						.svc
-						  |
-						  |
-					filename_repo
-						  |
-			______________|___________
-		   |		  	  |			  |
-		   |			  |			  |
-	  masterfile       mf_head    versions
-	  								  |
-	  							______|_____ _______ ........
-	  						   |            |		|		!
-	  						   |			|		|		!
-	  					  version_head		v1		v2		vnth
-**/
+/*
+		FILE STRUCTURE:
+
+					     .svc
+					       |
+					  filename_repo
+					/               \
+				       /		 \
+				-masterfile           version
+				-master_head        /         \
+						ver_head      -v1
+							      -v2
+			   				      -v3
+							       :
+					         	       :
+*/
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>

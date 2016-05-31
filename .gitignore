@@ -75,7 +75,9 @@ modules/views/
 
 
 # --------------------
-# ignore executables
+# ignore executables and test files
 # --------------------
-*.o
-re_svc*
+svc/*.o
+svc/svc
+svc/re_svc
+svc/*.txt

@@ -6,6 +6,9 @@ from threading import Thread
 import subprocess
 import multiprocessing
 
+
+log_file = open("duplicate_log.txt",'w')
+
 def hashfile(file_path):
     sha1 = hashlib.sha1()
     f = open(file_path, 'rb')
@@ -37,6 +40,7 @@ def dispatch_threads():
 	# joining threads to main thread
 	for thread in threads:
 		thread.join()
+	log_file.write("Number of threads created are : " + str(thread_num)+"\n\n")
 
 # 
 def calc_sha_1(size_list, file_paths):
@@ -59,20 +63,29 @@ size_list = defaultdict(list)
 
 for pair in utf_buffer.split("&"):
 	if(pair):
-		size,path=pair.strip().split(";")	
-		size_list[int(size)].append(str(path))	
+		l=pair.strip().split(";")
+		if len(l)==2:
+			size=l[0]
+			path=l[1]	
+			size_list[int(size)].append(str(path))	
 
 # sha-1 vs filenames dictionary
 sha1_list = defaultdict(list)
 # dispatch threads
 dispatch_threads()
 
+log_file.write("\n\n========================== Duplicate files ========================== \n\n")
 # Printing the results
 for sha_val, file_paths in sha1_list.items():
 	if(len(file_paths) > 1):
 		print("Sha1 value: "+sha_val+" duplicate files: ",end='\n\n')
+		log_file.write("Sha1 value: "+sha_val+" duplicate files: \n\n")
+
 		for file_path in file_paths:
 			print(file_path)
+			log_file.write(file_path+"\n")
+		log_file.write("\n")
 
 print()
 print("Program completed successfully!!!!")
+log_file.write("\n\nProgram completed successfully!!!!\n\n")

@@ -1,4 +1,4 @@
-all: re_svc svc
+all:  svc
 re_svc: re_svc.o
 	g++ -o re_svc re_svc.o
 
@@ -8,5 +8,5 @@ re_svc.o: re_svc.cpp
 svc: svc.o
 	g++ -o svc svc.o
 svc.o: svc.cpp
-	g++ -c svc.cpp
+	g++ -c svc.cpp --std=c++11
 

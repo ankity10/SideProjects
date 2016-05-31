@@ -112,7 +112,7 @@ class svc
 		void initialize_all();
 		void commit_ver0();
 		void commit();
-		int stoi(string);
+		int str_to_int(string);
 		string itos(int);
 
 		string retrive();
@@ -300,7 +300,7 @@ svc::svc(string filename, int file_version){
 
 
 //================= utils starts======================
-int svc::stoi(string s)
+int svc::str_to_int(string s)
 {
 	int sum=0;
 	int p=1;
@@ -430,7 +430,7 @@ void svc::commit()
 	this->path_to_prev_version = path_to_version+"v"+version_head;
 	this->fin_prev_version.open(this->path_to_prev_version.c_str());
 
-	int ver_head = stoi(version_head);
+	int ver_head = str_to_int(version_head);
 	ver_head++;
 	string current_version = "v"+itos(ver_head);
 	this->fout_version_head.open(this->path_to_version_head.c_str());
@@ -493,7 +493,7 @@ void svc::commit()
 		
 		string master_head;
 		fin_master_head>>master_head;
-		this->master_head=stoi(master_head);
+		this->master_head=str_to_int(master_head);
 		this->master_head++;
 		master_head=itos(this->master_head);
 
@@ -524,7 +524,7 @@ void svc::commit()
 		file_line.resize(9);
 
 		getline(fin_prev_version, line_no);
-		int line = stoi(line_no);
+		int line = str_to_int(line_no);
 
 		int file_ptr = (line-1)*10;
 		fin_masterfile.seekg(file_ptr);
@@ -553,7 +553,7 @@ void svc::commit()
 					file_line[i]=' ';
 
 				getline(fin_prev_version, line_no);
-				int line = stoi(line_no);
+				int line = str_to_int(line_no);
 
 				int file_ptr = (line-1)*10;
 				fin_masterfile.seekg(file_ptr);

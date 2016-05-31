@@ -81,3 +81,4 @@ svc/*.o
 svc/svc
 svc/re_svc
 svc/*.txt
+svc/.svc/

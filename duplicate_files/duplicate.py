@@ -26,7 +26,7 @@ def dispatch_threads():
 	# creating one thread for each size having more than one file
 	for size, file_path in size_list.items():
 		if(len(file_path) != 1):
-			while threading.active_count()==4:
+			while threading.active_count() == cpu_count:
 				pass
 			thread_num = thread_num + 1
 			thread_obj = threading.Thread(target=calc_sha_1, args=(size, file_path))
@@ -82,7 +82,8 @@ dispatch_threads()
 
 log_file.write("\n\n========================== Duplicate files ========================== \n\n")
 # Printing the results
-time.sleep(2)
+
+time.sleep(multiprocessing.cpu_count())
 for sha_val, file_paths in sha1_list.items():
 	if(len(file_paths) > 1):
 		print("Sha1 value: "+sha_val+" duplicate files: ",end='\n\n')

@@ -87,9 +87,9 @@ for sha_val, file_paths in sha1_list.items():
 		print("\n")
 
 		print("Enter the choice")
-		print("0. Do nothing")
 		print("1. Merge")
 		print("2. Remove")
+		print("3. Do nothing")
 		ch = 1
 
 		while(ch):
@@ -123,6 +123,9 @@ for sha_val, file_paths in sha1_list.items():
 				ch=0
 				for i in file_paths:
 					print("Deleting "+i)
+
+			elif(ch==3):
+				ch=0
 
 			else:
 				print("Enter valid choice!")

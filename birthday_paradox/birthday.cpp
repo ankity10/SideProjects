@@ -5,7 +5,6 @@
 using namespace std;
 #define precision 10
 
-const double experiments = 5000.0;
 
 double ret_probab(int n, double total_days)   //Returns the probability of minimum 2 of n people having birthday on same day.
 {
@@ -61,10 +60,8 @@ int main(int argc, char const *argv[])
 				int n;
 				cout<<"Enter the number of people: ";
 				cin>>n;  //Input number of people
-				double days;
-				cout<<"Enter the number of days: ";
-				cin>>days;
-				double probability = ret_probab(n, days);
+				
+				double probability = (3.0*ret_probab(n, 365.0) + ret_probab(n, 366.0))/4.0;
 				cout<<"Probability is: "<<setprecision(precision)<<probability<<endl<<endl;   //Sets precision upto 10 decimal points
 				break;
 			}
@@ -76,21 +73,30 @@ int main(int argc, char const *argv[])
 				cin>>n;
 
 				double days;
-				cout<<"Enter the number of days for random experiments: ";
-				cin>>days;
+				double experiments;
+				cout<<"Enter the number of trials for random experiments: ";
+				cin>>experiments;
+				int trials = int(experiments);
 
 				cout<<"Taking random experiments\n";
 
 				double sum=0.0;
-				for(int i=0;i<int(experiments);i++)
+				for(int i=1;i<=(trials*3)/4;i++)
 				{
-					double result = ret_result(n, int(days));
-					cout<<"Result of the experiment "<<(i+1)<<": "<<int(result)<<endl;
+					double result = ret_result(n, 365);
+					cout<<"Result of the experiment "<<i<<": "<<int(result)<<endl;
+					sum+=result;
+				}
+
+				for(int i=((trials*3)/4+1);i<=trials;i++)
+				{
+					double result = ret_result(n, 366);
+					cout<<"Result of the experiment "<<i<<": "<<int(result)<<endl;
 					sum+=result;
 				}
 
 				double experimental_mean_probability = sum/experiments;
-				double expected_probability = ret_probab(n, days);
+				double expected_probability = (3.0*ret_probab(n, 365.0) + ret_probab(n, 366.0))/4.0;
 				double diff = expected_probability-experimental_mean_probability;
 				double deviation;
 				

@@ -129,7 +129,6 @@ for sha_val, file_paths in sha1_list.items():
 
 			else:
 				print("Enter valid choice!")
-				ch=3
 
 		log_file.write("\n")
 

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import os
-=======
 #!/usr/local/bin/python3
->>>>>>> master
 import hashlib
 from collections import defaultdict
 import time
@@ -10,34 +6,6 @@ import threading
 import subprocess
 import multiprocessing
 
-<<<<<<< HEAD
-def hashfile(file_path):
-    sha1 = hashlib.sha1()
-    f = open(file_path, 'rb')
-    try:
-        sha1.update(f.read())
-    finally:
-        f.close()
-    return sha1.hexdigest()
-
-os.system("find -not -empty -type f -printf '%s\t%p\n'>a.txt")
-fil=open("a.txt","r");
-n=0
-a=defaultdict(list)
-for line in fil:
-	size=int
-	path=str
-	size,path=line.split()	
-	a[size].append(path)
-
-sha1_list = defaultdict(list)
-
-for size, path in a.items():
-	for file_path in path:
-		sha1_list[hashfile(file_path)].append(file_path)
-
-print sha1_list.items()
-=======
 
 log_file = open("duplicate_log.txt",'w')
 
@@ -131,4 +99,3 @@ for sha_val, file_paths in sha1_list.items():
 print()
 print("Program completed successfully!!!!")
 log_file.write("\n\nProgram completed successfully!!!!\n\n")
->>>>>>> master

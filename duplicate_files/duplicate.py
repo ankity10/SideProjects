@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+import os
 import hashlib
 from collections import defaultdict
 import time
@@ -35,17 +36,6 @@ def dispatch_threads():
 			
 			print(str(thread_num)+" thread started")
 
-			# if thread_num%cpu_count == 0:
-			# 	print("Waiting for previous 4 threads to complete the task")
-
-			# 	for i in range(1,5):
-			# 		threads[thread_num-i].join()
-
-					# thread_obj.join()
-
-	# joining threads to main thread
-	# for thread in threads:
-	# 	thread.join()
 	log_file.write("Number of threads created are : " + str(thread_num)+"\n\n")
 
 # 
@@ -54,9 +44,6 @@ def calc_sha_1(size_list, file_paths):
 		sha1_list[hashfile(file_path)].append(file_path)
 
 
-# Main function Start
-# os.system("find -not -empty -type f -printf '%s;%p\n'>a.txt")
-# info_file = open("a.txt","r")
 
 process_info = subprocess.run(["find", "-not", "-empty", "-type", "f", "-printf","%s;%p&"], stdout = subprocess.PIPE)
 binary_buffer = process_info.stdout
@@ -84,16 +71,63 @@ log_file.write("\n\n========================== Duplicate files =================
 # Printing the results
 
 time.sleep(multiprocessing.cpu_count())
+#Waiting for the last thread to execute
+
 for sha_val, file_paths in sha1_list.items():
 	if(len(file_paths) > 1):
 		print("Sha1 value: "+sha_val+" duplicate files: ",end='\n\n')
 		log_file.write("Sha1 value: "+sha_val+" duplicate files: \n\n")
 
+		no = 1
 		for file_path in file_paths:
-			print(file_path)
+			print("Path "+str(no)+": "+file_path)
 			log_file.write(file_path+"\n")
+			no+=1
 		
-		print("\n\n\n")
+		print("\n")
+
+		print("Enter the choice")
+		print("0. Do nothing")
+		print("1. Merge")
+		print("2. Remove")
+		ch = 1
+
+		while(ch):
+			ch = int(input())
+
+			if(ch==1):
+				ch=0
+				print("File paths:")
+				no = 1
+				for file_path in file_paths:
+					print("Path "+str(no)+": "+file_path)
+					log_file.write(file_path+"\n")
+					no+=1
+
+
+				print("Which file path would you like to keep?")
+				print("Enter the corresponding path no: ")
+				keep_path_no = int(input())
+
+				if(keep_path_no <= len(file_paths)):
+					keep_path = file_paths[keep_path_no-1]
+					for i in file_paths:
+						if(i != keep_path):
+							print("Deleting "+i)
+							os.system("rm -f "+i)
+
+				else:
+					print("Path "+str(keep_path_no)+" does'nt exist!")
+
+			elif(ch==2):
+				ch=0
+				for i in file_paths:
+					print("Deleting "+i)
+
+			else:
+				print("Enter valid choice!")
+				ch=3
+
 		log_file.write("\n")
 
 print()

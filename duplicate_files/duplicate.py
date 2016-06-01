@@ -2,7 +2,7 @@
 import hashlib
 from collections import defaultdict
 import time
-from threading import Thread
+import threading
 import subprocess
 import multiprocessing
 
@@ -26,20 +26,26 @@ def dispatch_threads():
 	# creating one thread for each size having more than one file
 	for size, file_path in size_list.items():
 		if(len(file_path) != 1):
+			while threading.active_count()==4:
+				pass
 			thread_num = thread_num + 1
-			thread_obj = Thread(target=calc_sha_1, args=(size, file_path))
+			thread_obj = threading.Thread(target=calc_sha_1, args=(size, file_path))
 			thread_obj.start()
 			threads.append(thread_obj)
 			
 			print(str(thread_num)+" thread started")
 
-			if thread_num%cpu_count == 0:
-				print("Waiting for previous 4 threads to complete the task")
-				thread_obj.join()
+			# if thread_num%cpu_count == 0:
+			# 	print("Waiting for previous 4 threads to complete the task")
+
+			# 	for i in range(1,5):
+			# 		threads[thread_num-i].join()
+
+					# thread_obj.join()
 
 	# joining threads to main thread
-	for thread in threads:
-		thread.join()
+	# for thread in threads:
+	# 	thread.join()
 	log_file.write("Number of threads created are : " + str(thread_num)+"\n\n")
 
 # 
@@ -76,6 +82,7 @@ dispatch_threads()
 
 log_file.write("\n\n========================== Duplicate files ========================== \n\n")
 # Printing the results
+time.sleep(2)
 for sha_val, file_paths in sha1_list.items():
 	if(len(file_paths) > 1):
 		print("Sha1 value: "+sha_val+" duplicate files: ",end='\n\n')
@@ -84,6 +91,8 @@ for sha_val, file_paths in sha1_list.items():
 		for file_path in file_paths:
 			print(file_path)
 			log_file.write(file_path+"\n")
+		
+		print("\n\n\n")
 		log_file.write("\n")
 
 print()

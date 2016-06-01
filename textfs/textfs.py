@@ -1,5 +1,5 @@
 import time,sys,shelve
-
+import os.path
 
 class file_class(object):
 
@@ -31,17 +31,19 @@ cmd=raw_input(">").split()
 while(cmd[0]!="exit"):
 
 	if cmd[0]=="create":
-		found=0
-		for inode_no, obj in io.items():
-			if obj.name==cmd[1]:
-				found=1
-				break
-		if found:
-			print "File "+cmd[1]+" already exists"
-		else:
-			f=file_class()
-			f.create(cmd[1])
-			io[f.inode_no]=f
+		for i in range(1,len(cmd)):
+			found=0
+			for inode_no, obj in io.items():
+				if obj.name==cmd[i]:
+					found=1
+					break
+			if found:
+				print "File "+cmd[i]+" already exists!"
+			else:
+				f=file_class()
+				f.create(cmd[i])
+				io[f.inode_no]=f
+				print "File "+cmd[i]+" created!"
 
 	elif cmd[0]=="copy":
 		if len(cmd)==3:
@@ -52,30 +54,52 @@ while(cmd[0]!="exit"):
 					break
 			if found==1:
 				print "File "+cmd[2]+" already exists!"
-			else:		
-				f=file_class()
-				f.copy(cmd[1],cmd[2])
-				io[f.inode_no]=f
-				print len(io.items())
+			else:
+				if os.path.isfile(cmd[1]):	
+					f=file_class()
+					f.copy(cmd[1],cmd[2])
+					io[f.inode_no]=f
+					print len(io.items())
+				else:
+					print "File "+cmd[1]+" doesn't exist!"
+
+		else:
+			print "Arguments incorrect. "
+			print "Correct command: copy source destination"
 
 	elif cmd[0]=="echo":
-		found=0
-		for inode_no,obj in io.items():
-			if obj.name==cmd[1] :
-				obj.echo()
-				found=1
-		if found==0:
-			print "File not found"
+		if len(cmd)==2:
+			found=0
+			for inode_no,obj in io.items():
+				if obj.name==cmd[1] :
+					obj.echo()
+					found=1
+			if found==0:
+				print "File not found"
+
+		else:
+			print "Arguments incorrect. "
+			print "Correct command: echo filename"
 
 	elif cmd[0]=="delete":
-		found=0
-		for inode_no,obj in io.items():
-			if obj.name==cmd[1]:
-				del io[obj.inode_no]
+		if len(cmd)==2:	
+			found=0
+			for inode_no,obj in io.items():
+				if obj.name==cmd[1]:
+					del io[obj.inode_no]
+
+		else:
+			print "Arguments incorrect. "
+			print "Correct command: delete filename"
 
 	elif cmd[0]=="ls":
-		for inode_no,obj in io.items():
-			print obj.name
+		if len(cmd)==1:
+			for inode_no,obj in io.items():
+				print obj.name
+
+		else:
+			print "Arguments incorrect. "
+			print "Correct command: ls"
 
 
 	else:

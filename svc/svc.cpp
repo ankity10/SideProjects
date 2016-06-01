@@ -2,17 +2,17 @@
 		FILE STRUCTURE:
 
 					     .svc
-						   |
+					       |
 					  filename_repo
 					/               \
-				   /				 \
+				       /		 \
 				-masterfile           version
 				-master_head        /         \
-								ver_head	  -v1
-											  -v2
-											  -v3
-												:
-												:
+						ver_head      -v1
+							      -v2
+			   				      -v3
+							       :
+					         	       :
 */
 #include <iostream>
 #include <fstream>

@@ -1,11 +1,12 @@
 import time
 
 class File_obj:
-
+	
 	def __init__(self):
 		self.inode_no=str
 		x=open("superblock.txt","a+")
 		x.close()
+		
 
 	def create(self,file_name):
 		with open("superblock.txt","a+") as sb_obj:
@@ -25,7 +26,7 @@ class File_obj:
 					inode_no=str(time.time())
 					textfs_obj.write(inode_no+";"+destination+";"+des.read())
 					#textfs_obj.write(des.read())
-					pos2=f_start(textfs_obj.tell())
+					pos2=str(textfs_obj.tell())
 					sb_obj.write(destination+";"+pos+";"+pos2+";"+inode_no+"\n")
 
 
@@ -85,22 +86,71 @@ class File_obj:
 			with open("textfs.txt","w") as textfs_obj:
 				sb_obj.write(sb_upper+sb_lower)
 				textfs_obj.write(textfs_upper+textfs_lower)
+	def get_files_names(self):
+		with open("superblock.txt","r") as sb_obj:
+			for sb_info in sb_obj:
+				sb_file_info=sb_info.split(";")
+				File_obj.file_names[sb_file_info[0]]=1
 
 
 
 obj=File_obj()
 print "COMMANDS:create,delete,echo,copy,exit,ls"
+file_names={}
+with open("superblock.txt","r") as sb_obj:
+	for sb_info in sb_obj:
+		sb_file_info=sb_info.split(";")
+		file_names[sb_file_info[0]]=1
 cmd=raw_input(">").split()
 
 while(cmd[0]!="exit"):
 	if cmd[0]=="create":
-		obj.create(cmd[1])
+		if len(cmd)<=1:
+			print "Arguments Incorrect"
+			print "Correct command: create filename"
+		else:
+			for i in range(1,len(cmd)):
+				if file_names.has_key(cmd[i]):
+					print "File "+cmd[i]+" already exist"
+				else:
+					print "File "+cmd[i]+" created"
+					obj.create(cmd[i])
+					file_names[cmd[i]]=1
 	elif cmd[0]=="copy":
-		obj.copy(cmd[1],cmd[2])
+		if len(cmd)!=3:
+			print "Arguments Incorrect"
+			print "Correct command: copy source destination"
+		else:
+			if file_names.has_key(cmd[2]):
+				print "File "+cmd[2]+" already exist"
+			else:
+				obj.copy(cmd[1],cmd[2])
+				file_names[cmd[2]]=1
 	elif cmd[0]=="echo":
-		obj.echo(cmd[1])
+		if len(cmd)!=2:
+			print "Arguments Incorrect"
+			print "Correct command: echo filename"
+		else:
+			if file_names.has_key(cmd[1]):
+				obj.echo(cmd[1])
+			else:
+				print "File not found"
 	elif cmd[0]=="ls":
-		obj.ls()
+		if len(cmd)!=1:
+			print "Arguments Incorrect"
+			print "Correct command: ls"
+		else:
+			obj.ls()
 	elif cmd[0]=="delete":
-		obj.delete(cmd[1])
+		if len(cmd)!=2:
+			print "Arguments Incorrect"
+			print "Correct command: delete filename"
+		else:
+			if file_names.has_key(cmd[1]):
+				obj.delete(cmd[1])
+				del file_names[cmd[1]]
+			else:
+				print "File not found"
+	else:
+		print "Invalid command"
 	cmd=raw_input(">").split()

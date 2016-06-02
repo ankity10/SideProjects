@@ -1,10 +1,13 @@
-import time,os
+import time
 
 def create(file_name):
 	with open("superblock.txt","a+") as sb_obj:
 		with open("textfs.txt","a+") as textfs_obj:
+			inode_no=str(time.time())
 			pos=str(textfs_obj.tell())
-			sb_obj.write(file_name+";"+pos+";"+pos+";"+str(time.time())+"\n")
+			textfs_obj.write(inode_no+";"+file_name+";"+" ")
+			pos1=str(textfs_obj.tell())
+			sb_obj.write(file_name+";"+pos+";"+pos1+";"+inode_no+"\n")
 
 
 def copy(source,destination):
@@ -16,7 +19,7 @@ def copy(source,destination):
 				textfs_obj.write(inode_no+";"+destination+";"+des.read())
 				#textfs_obj.write(des.read())
 				pos2=str(textfs_obj.tell())
-				sb_obj.write(destination+";"+pos+";"+pos2+";"+str(time.time())+"\n")
+				sb_obj.write(destination+";"+pos+";"+pos2+";"+inode_no+"\n")
 
 
 def echo(file_name):
@@ -88,4 +91,3 @@ while(cmd[0]!="exit"):
 	elif cmd[0]=="delete":
 		delete(cmd[1])
 	cmd=raw_input(">").split()
-

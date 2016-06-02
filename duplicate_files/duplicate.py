@@ -6,7 +6,11 @@ import time
 import threading
 import subprocess
 import multiprocessing
+import xxhash
+import sys
+import time
 
+t_start = time.time()
 
 log_file = open("duplicate_log.txt",'w')
 
@@ -19,6 +23,14 @@ def hashfile(file_path):
         f.close()
     return sha1.hexdigest()
 
+def hash_file(file_path):
+	with open(file_path, 'rb') as f:
+    #with open(sys.argv[1],'rb') as f:
+		content = f.read()
+		return xxhash.xxh64(content).hexdigest()
+
+
+
 def dispatch_threads():
 	# threads container to hold threads
 	threads = []
@@ -27,7 +39,7 @@ def dispatch_threads():
 	# creating one thread for each size having more than one file
 	for size, file_path in size_list.items():
 		if(len(file_path) != 1):
-			while threading.active_count() == cpu_count:
+			while threading.active_count() == cpu_count*10:
 				pass
 			thread_num = thread_num + 1
 			thread_obj = threading.Thread(target=calc_sha_1, args=(size, file_path))
@@ -41,7 +53,7 @@ def dispatch_threads():
 # 
 def calc_sha_1(size_list, file_paths):
 	for file_path in file_paths:
-		sha1_list[hashfile(file_path)].append(file_path)
+		sha1_list[hash_file(file_path)].append(file_path)
 
 
 
@@ -70,9 +82,10 @@ dispatch_threads()
 log_file.write("\n\n========================== Duplicate files ========================== \n\n")
 # Printing the results
 
-time.sleep(multiprocessing.cpu_count())
+# time.sleep(multiprocessing.cpu_count())
 #Waiting for the last thread to execute
-
+while threading.active_count() >1:
+	pass
 for sha_val, file_paths in sha1_list.items():
 	if(len(file_paths) > 1):
 		print("Sha1 value: "+sha_val+" duplicate files: ",end='\n\n')
@@ -93,8 +106,8 @@ for sha_val, file_paths in sha1_list.items():
 		ch = 1
 
 		while(ch):
-			ch = int(input())
-
+			# ch = int(input())
+			ch = 3
 			if(ch==1):
 				ch=0
 				print("File paths:")
@@ -132,6 +145,9 @@ for sha_val, file_paths in sha1_list.items():
 
 		log_file.write("\n")
 
+
+log_file.write("\n\nProgram completed successfully!!!!\n\n")
 print()
 print("Program completed successfully!!!!")
-log_file.write("\n\nProgram completed successfully!!!!\n\n")
+t_end = time.time()
+print("Total Execution time: "+str(t_end - t_start))

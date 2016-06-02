@@ -1,6 +1,5 @@
 #!/usr/local/bin/python3
 import os
-import hashlib
 from collections import defaultdict
 import time
 import threading
@@ -14,18 +13,8 @@ t_start = time.time()
 
 log_file = open("duplicate_log.txt",'w')
 
-def hashfile(file_path):
-    sha1 = hashlib.sha1()
-    f = open(file_path, 'rb')
-    try:
-        sha1.update(f.read())
-    finally:
-        f.close()
-    return sha1.hexdigest()
-
-def hash_file(file_path):
+def file_hash(file_path):
 	with open(file_path, 'rb') as f:
-    #with open(sys.argv[1],'rb') as f:
 		content = f.read()
 		return xxhash.xxh64(content).hexdigest()
 
@@ -42,7 +31,7 @@ def dispatch_threads():
 			while threading.active_count() == cpu_count*10:
 				pass
 			thread_num = thread_num + 1
-			thread_obj = threading.Thread(target=calc_sha_1, args=(size, file_path))
+			thread_obj = threading.Thread(target=calc_hash, args=(size, file_path))
 			thread_obj.start()
 			threads.append(thread_obj)
 			
@@ -50,10 +39,10 @@ def dispatch_threads():
 
 	log_file.write("Number of threads created are : " + str(thread_num)+"\n\n")
 
-# 
-def calc_sha_1(size_list, file_paths):
+
+def calc_hash(size_list, file_paths):
 	for file_path in file_paths:
-		sha1_list[hash_file(file_path)].append(file_path)
+		hash_list[file_hash(file_path)].append(file_path)
 
 
 
@@ -74,8 +63,8 @@ for pair in utf_buffer.split("&"):
 			path=l[1]	
 			size_list[int(size)].append(str(path))	
 
-# sha-1 vs filenames dictionary
-sha1_list = defaultdict(list)
+# hash vs filenames dictionary
+hash_list = defaultdict(list)
 # dispatch threads
 dispatch_threads()
 
@@ -86,10 +75,10 @@ log_file.write("\n\n========================== Duplicate files =================
 #Waiting for the last thread to execute
 while threading.active_count() >1:
 	pass
-for sha_val, file_paths in sha1_list.items():
+for hash_val, file_paths in hash_list.items():
 	if(len(file_paths) > 1):
-		print("Sha1 value: "+sha_val+" duplicate files: ",end='\n\n')
-		log_file.write("Sha1 value: "+sha_val+" duplicate files: \n\n")
+		print("hash value: "+hash_val+" duplicate files: ",end='\n\n')
+		log_file.write("hash value: "+hash_val+" duplicate files: \n\n")
 
 		no = 1
 		for file_path in file_paths:

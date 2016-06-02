@@ -31,19 +31,24 @@ cmd=raw_input(">").split()
 while(cmd[0]!="exit"):
 
 	if cmd[0]=="create":
-		for i in range(1,len(cmd)):
-			found=0
-			for inode_no, obj in io.items():
-				if obj.name==cmd[i]:
-					found=1
-					break
-			if found:
-				print "File "+cmd[i]+" already exists!"
-			else:
-				f=file_class()
-				f.create(cmd[i])
-				io[f.inode_no]=f
-				print "File "+cmd[i]+" created!"
+		if len(cmd)==1:
+			print "Arguments incorrect. "
+			print "Correct command: create filename"
+		else:
+			for i in range(1,len(cmd)):
+				found=0
+				for inode_no, obj in io.items():
+					if obj.name==cmd[i]:
+						found=1
+						break
+				if found:
+					print "File "+cmd[i]+" already exists!"
+				else:
+					f=file_class()
+					f.create(cmd[i])
+					io[f.inode_no]=f
+					print "File "+cmd[i]+" created!"
+					io.sync()
 
 	elif cmd[0]=="copy":
 		if len(cmd)==3:
@@ -59,6 +64,7 @@ while(cmd[0]!="exit"):
 					f=file_class()
 					f.copy(cmd[1],cmd[2])
 					io[f.inode_no]=f
+					io.sync()
 					print len(io.items())
 				else:
 					print "File "+cmd[1]+" doesn't exist!"
@@ -87,6 +93,7 @@ while(cmd[0]!="exit"):
 			for inode_no,obj in io.items():
 				if obj.name==cmd[1]:
 					del io[obj.inode_no]
+					io.sync()
 
 		else:
 			print "Arguments incorrect. "
@@ -106,4 +113,5 @@ while(cmd[0]!="exit"):
 		print "Invalid Command"
 
 	cmd=raw_input(">").split()
-	
+
+io.sync()	

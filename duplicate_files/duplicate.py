@@ -95,8 +95,7 @@ for hash_val, file_paths in hash_list.items():
 		ch = 1
 
 		while(ch):
-			# ch = int(input())
-			ch = 3
+			ch = int(input())
 			if(ch==1):
 				ch=0
 				print("File paths:")

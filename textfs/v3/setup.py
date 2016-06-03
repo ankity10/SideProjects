@@ -1,6 +1,6 @@
 import os,sys
 
-f = open("a.txt","w")
+f = open("filesystem.txt","w")
 chunk_size_Bytes = 1000
 
 filedata_size_MB = 1
@@ -8,7 +8,7 @@ filedata_size_MB = 1
 filedata_num_chunks = filedata_size_MB * 1000
 
 inode_table_num_chunks = 100
-superblock_num_chunks = 100
+superblock_num_chunks = 101
 
 filesystem_size_Bytes = (filedata_num_chunks+inode_table_num_chunks+superblock_num_chunks)*chunk_size_Bytes
 

@@ -54,7 +54,7 @@ class Filesystem():
 
 
 	def create(self, name):
-		file = File()
+		file = File(name)
 
 
 

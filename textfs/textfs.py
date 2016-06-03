@@ -26,7 +26,7 @@ class file_class(object):
 #f.create("b.txt")
 io=shelve.open("textfs.sys",writeback=True)
 print "COMMANDS:create,delete,echo,copy"
-cmd=raw_input(">").split()
+cmd=raw_input(" > ").split()
 
 while(cmd[0]!="exit"):
 
@@ -112,6 +112,7 @@ while(cmd[0]!="exit"):
 	else:
 		print "Invalid Command"
 
-	cmd=raw_input(">").split()
+
+	cmd=raw_input(" > ").split()
 
 io.sync()	

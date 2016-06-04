@@ -1,1 +1,2 @@
 1234567890qwertyuiop
+			fin.seek((filedata_start) + (first * 1000) + (i * 1000), 0)

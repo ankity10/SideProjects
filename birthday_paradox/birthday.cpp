@@ -98,7 +98,7 @@ int main(int argc, char const *argv[])
 				double experimental_mean_probability = sum/experiments;
 				double expected_probability = (3.0*ret_probab(n, 365.0) + ret_probab(n, 366.0))/4.0;
 				double diff = expected_probability-experimental_mean_probability;
-				double deviation;
+				double deviation=diff;
 				
 				if(diff<0)
 					deviation = -1.0*diff;
